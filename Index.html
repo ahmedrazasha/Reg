@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>رجسٹریشن فیصلہ جنریٹر - سید احمد رضا شاہ</title>
+    
+    <!-- PDF.js & Tesseract OCR CDNs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+    <style>
+        @font-face {
+            font-family: 'Jameel Noori Nastaleeq';
+            src: url('https://cdn.jsdelivr.net/gh/m-a-k-s/jameel-noori-nastaleeq-kasheeda/Jameel%20Noori%20Nastaleeq%20Kasheeda.ttf');
+        }
+
+        :root {
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --border: #cbd5e1;
+            --border-focus: #0f172a;
+            --primary: #0f172a;
+            --primary-hover: #1e293b;
+            --accent: #2563eb;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --danger: #ef4444;
+            --success: #059669;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', Tahoma, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-dark);
+            min-height: 100vh;
+            overflow-y: auto;
+        }
+
+        header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 10px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .brand-text {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--primary);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .brand-phone {
+            font-size: 16px;
+            color: var(--text-muted);
+            font-family: monospace;
+            direction: ltr;
+        }
+
+        .main-wrapper {
+            max-width: 1350px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Top Toolbar */
+        .top-tools-bar {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .tools-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .upload-badge {
+            border: 1.5px dashed #94a3b8;
+            border-radius: 6px;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f1f5f9;
+            cursor: pointer;
+            position: relative;
+            transition: 0.15s;
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--accent);
+        }
+        .upload-badge:hover { border-color: var(--accent); background: #eff6ff; }
+        .upload-badge input[type="file"] {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .type-segmented {
+            display: flex;
+            background: #f1f5f9;
+            padding: 3px;
+            border-radius: 6px;
+            gap: 4px;
+        }
+        .type-segmented button {
+            padding: 6px 16px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 19px;
+            color: var(--text-muted);
+            transition: 0.15s;
+        }
+        .type-segmented button.active {
+            background: var(--surface);
+            color: var(--primary);
+            font-weight: bold;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 260px 1fr 1fr 1fr;
+            gap: 12px;
+            align-items: start;
+        }
+
+        @media (max-width: 1150px) {
+            .dashboard-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 700px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .card-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 19px;
+            font-weight: bold;
+            color: var(--primary);
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 6px;
+        }
+
+        .items-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow: visible;
+        }
+
+        .item-row {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            padding: 10px;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .field-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .field-wrap label {
+            font-size: 15px;
+            color: var(--text-muted);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+        }
+
+        /* 22px High-Readability Inputs */
+        input[type="text"] {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 22px !important;
+            outline: none;
+            background: #fff;
+            color: var(--text-dark);
+            transition: 0.15s;
+            line-height: 1.3;
+        }
+        input[type="text"]::placeholder {
+            color: #94a3b8;
+            font-size: 18px;
+        }
+        input[type="text"]:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 1.5px var(--border-focus);
+        }
+
+        /* Strict LTR for English/Numbers */
+        .ltr-input {
+            direction: ltr !important;
+            text-align: center !important;
+            font-family: Consolas, 'Courier New', monospace, sans-serif !important;
+            font-size: 22px !important;
+            letter-spacing: 1px;
+        }
+
+        .btn-mini {
+            border: 1px solid var(--border);
+            background: #f1f5f9;
+            padding: 4px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            color: var(--text-dark);
+        }
+        .btn-mini:hover { background: #e2e8f0; }
+
+        .btn-del {
+            border: 1px dashed #fca5a5;
+            background: #fef2f2;
+            color: var(--danger);
+            font-size: 15px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .btn-del:hover { background: #fee2e2; }
+
+        /* Output / Deed Paper */
+        .output-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .output-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+        }
+
+        .faisla-paper {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 35px 40px;
+            font-size: 24px;
+            line-height: 2.3;
+            text-align: justify;
+            direction: rtl;
+            min-height: 200px;
+            color: #0f172a;
+        }
+
+        .btn-action {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 24px;
+            font-size: 18px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-action:hover { background: var(--primary-hover); }
+
+        .status-pill {
+            font-size: 14px;
+            color: var(--accent);
+            font-family: sans-serif;
+            display: none;
+        }
+
+        /* Direct Paste Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 550px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        textarea {
+            width: 100%;
+            height: 140px;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 17px;
+            direction: rtl;
+            outline: none;
+        }
+
+        @media print {
+            header, .top-tools-bar, .dashboard-grid, .output-head, .modal { display: none !important; }
+            body, .main-wrapper, .output-card { background: white; padding: 0; margin: 0; border: none; }
+            .faisla-paper { border: none; padding: 15px 5px; font-size: 24px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand-text">
+            <span>فیصلہ / رجسٹریشن دستاویز ساز</span>
+            <span class="brand-phone">0308-7659192 (سید احمد رضا شاہ)</span>
+        </div>
+        <div>
+            <button class="btn-mini" style="color: var(--danger);" onclick="clearAll()">تمام ڈیٹا صاف کریں</button>
+        </div>
+    </header>
+
+    <div class="main-wrapper">
+        
+        <!-- Top Tools Bar -->
+        <div class="top-tools-bar">
+            <div class="tools-right">
+                <div class="upload-badge">
+                    <input type="file" id="fileUpload" accept="image/*, application/pdf" onchange="processSmartFile(event)">
+                    <span>⚡ فرد / جمع بندی (PDF یا تصویر) سے مکمل ڈیٹا حاصل کریں</span>
+                    <span class="status-pill" id="fetchStatus">پراسیسنگ جاری ہے...</span>
+                </div>
+                <button class="btn-mini" style="padding: 7px 14px; font-size: 17px;" onclick="openPasteModal()">📋 تحریر پیسٹ کریں</button>
+            </div>
+
+            <!-- Type Selector -->
+            <div class="type-segmented">
+                <button type="button" class="active" id="btn-sale" onclick="changeDocType('sale')">بیع نامہ</button>
+                <button type="button" id="btn-hiba" onclick="changeDocType('hiba')">ہبہ / تملیک</button>
+            </div>
+        </div>
+
+        <!-- Inputs Dashboard -->
+        <div class="dashboard-grid">
+            
+            <!-- 1. Left Side: Task No & Amount -->
+            <div class="card" style="background: #fafafa;">
+                <div class="card-title">بنیادی تفصیلات</div>
+                
+                <div class="field-wrap">
+                    <label>ٹاسک نمبر (Task No)</label>
+                    <input type="text" id="task" class="ltr-input" placeholder="مثلاً: 145465464" oninput="saveAndBuild()">
+                </div>
+
+                <div class="field-wrap" id="amount-box">
+                    <label>کل رقم مبلغ (روپے)</label>
+                    <input type="text" id="amount" class="ltr-input" placeholder="5,00,000" oninput="formatAmount(this); saveAndBuild()">
+                </div>
+
+                <!-- Hiba Checkboxes -->
+                <div id="hiba-box" style="display: none; flex-direction: column; gap: 6px; font-size: 16px; background: #f1f5f9; padding: 8px; border-radius: 6px; margin-top: 4px;">
+                    <label><input type="checkbox" id="opt-hiba" checked onchange="saveAndBuild()"> ہبہ</label>
+                    <label><input type="checkbox" id="opt-tamleek" checked onchange="saveAndBuild()"> تملیک</label>
+                    <label><input type="checkbox" id="opt-waris" onchange="saveAndBuild()"> بحق وارثان</label>
+                    <label><input type="checkbox" id="opt-ghair-waris" onchange="saveAndBuild()"> بحق غیر وارثان</label>
+                </div>
+            </div>
+
+            <!-- 2. Giver (بائع / واہب) -->
+            <div class="card">
+                <div class="card-title">
+                    <span id="giver-label">دینے والا (بائع)</span>
+                    <button class="btn-mini" onclick="addPartyRow('sellers')">+ شامل کریں</button>
+                </div>
+                <div id="sellers-container" class="items-container"></div>
+            </div>
+
+            <!-- 3. Taker (مشتری / موہوب الیہ) -->
+            <div class="card">
+                <div class="card-title">
+                    <span id="taker-label">لینے والا (مشتری)</span>
+                    <button class="btn-mini" onclick="addPartyRow('buyers')">+ شامل کریں</button>
+                </div>
+                <div id="buyers-container" class="items-container"></div>
+            </div>
+
+            <!-- 4. Property & Khata Details -->
+            <div class="card">
+                <div class="card-title">
+                    <span>رقبہ و کھاتہ تفصیل</span>
+                    <button class="btn-mini" onclick="addPropertyRow()">+ رقبہ شامل کریں</button>
+                </div>
+                <div id="properties-container" class="items-container"></div>
+            </div>
+
+        </div>
+
+        <!-- Generated Faisla Section -->
+        <div class="output-card">
+            <div class="output-head">
+                <span style="font-size: 20px; font-weight: bold; color: var(--primary);">تیار شدہ رجسٹریشن فیصلہ / سند</span>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-action" onclick="copyResult()">تحریر کاپی کریں</button>
+                    <button class="btn-mini" style="padding: 8px 16px; font-size: 17px;" onclick="window.print()">پرنٹ نکالیں</button>
+                </div>
+            </div>
+
+            <div class="faisla-paper" id="faislaOutput"></div>
+        </div>
+
+    </div>
+
+    <!-- Direct Paste Modal -->
+    <div class="modal" id="pasteModal">
+        <div class="modal-content">
+            <h3 style="font-size: 18px;">متن یا فرد کا ڈیٹا یہاں پیسٹ کریں</h3>
+            <textarea id="rawPastedText" placeholder="پی ڈی ایف یا پورٹل سے کاپی شدہ تحریر یہاں پیسٹ کریں..."></textarea>
+            <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                <button class="btn-mini" onclick="closePasteModal()">منسوخ</button>
+                <button class="btn-action" style="padding: 5px 15px; font-size: 16px;" onclick="processRawText()">ڈیٹا نکالیں</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        let currentType = 'sale';
+
+        window.onload = function() {
+            loadSaved();
+            buildDeed();
+        };
+
+        function changeDocType(t) {
+            currentType = t;
+            document.getElementById('btn-sale').classList.toggle('active', t === 'sale');
+            document.getElementById('btn-hiba').classList.toggle('active', t === 'hiba');
+            document.getElementById('amount-box').style.display = (t === 'sale') ? 'flex' : 'none';
+            document.getElementById('hiba-box').style.display = (t === 'sale') ? 'none' : 'flex';
+            document.getElementById('giver-label').innerText = (t === 'sale') ? 'دینے والا (بائع)' : 'دینے والا (واہب)';
+            document.getElementById('taker-label').innerText = (t === 'sale') ? 'لینے والا (مشتری)' : 'لینے والا (موہوب الیہ)';
+            saveAndBuild();
+        }
+
+        function addPartyRow(target, name = '', cnic = '') {
+            const container = document.getElementById(target + '-container');
+            const div = document.createElement('div');
+            div.className = 'item-row';
+            div.innerHTML = `
+                <input type="text" class="p-name" placeholder="نام مع ولدیت و قوم" value="${name}" oninput="saveAndBuild()">
+                <input type="text" class="p-cnic ltr-input" placeholder="31304-0000000-0" value="${cnic}" oninput="formatCNIC(this); saveAndBuild()">
+                <button class="btn-del" onclick="this.parentElement.remove(); saveAndBuild()">حذف کریں</button>
+            `;
+            container.appendChild(div);
+        }
+
+        function addPropertyRow(mouza = '', khata = '', khatooni = '', area = '', salem = '') {
+            const container = document.getElementById('properties-container');
+            const div = document.createElement('div');
+            div.className = 'item-row';
+            div.innerHTML = `
+                <div class="grid-2">
+                    <input type="text" class="pr-mouza" placeholder="واقع موضع" value="${mouza}" oninput="saveAndBuild()">
+                    <input type="text" class="pr-khata ltr-input" placeholder="کھیوٹ / کھاتہ نمبر" value="${khata}" oninput="saveAndBuild()">
+                </div>
+                <div class="grid-3">
+                    <input type="text" class="pr-khatooni ltr-input" placeholder="کھتونی نمبر" value="${khatooni}" oninput="saveAndBuild()">
+                    <input type="text" class="pr-area" placeholder="رقبہ منتقلہ" value="${area}" oninput="saveAndBuild()">
+                    <input type="text" class="pr-salem ltr-input" placeholder="مخصوص حصہ (مثلاً: 1/1)" value="${salem}" oninput="saveAndBuild()">
+                </div>
+                <button class="btn-del" onclick="this.parentElement.remove(); saveAndBuild()">حذف کریں</button>
+            `;
+            container.appendChild(div);
+        }
+
+        function formatCNIC(input) {
+            let v = input.value.replace(/\D/g, '');
+            let f = '';
+            if (v.length > 0) f += v.substring(0, 5);
+            if (v.length > 5) f += '-' + v.substring(5, 12);
+            if (v.length > 12) f += '-' + v.substring(12, 13);
+            input.value = f;
+        }
+
+        function formatAmount(input) {
+            let v = input.value.replace(/,/g, '').replace(/\D/g, '');
+            if (v.length > 0) {
+                input.value = Number(v).toLocaleString('en-IN');
+            }
+        }
+
+        // Strict LTR Wrapper for CNIC and Numbers
+        function wrapStrictLTR(val) {
+            if (!val || val.trim() === '') return '__________';
+            return `\u200E\u202A${val.trim()}\u202C\u200E`;
+        }
+
+        // Build Deed (Updated with: "مشترکہ کھاتہ میں سے مخصوص حصہ 1/1")
+        function buildDeed() {
+            const sRows = document.querySelectorAll('#sellers-container .item-row');
+            const bRows = document.querySelectorAll('#buyers-container .item-row');
+            const pRows = document.querySelectorAll('#properties-container .item-row');
+
+            const sTerm = (currentType === 'sale') ? (sRows.length > 1 ? "من مِقران" : "من مِقر") : (sRows.length > 1 ? "واہبان" : "واہب");
+            const bTerm = (currentType === 'sale') ? (bRows.length > 1 ? "مشتریان" : "مشتری") : (bRows.length > 1 ? "موہوب الیہان" : "موہوب الیہ");
+
+            const sList = Array.from(sRows).map(r => {
+                let name = r.querySelector('.p-name').value.trim() || '__________';
+                let cnic = r.querySelector('.p-cnic').value.trim();
+                return `${name} شناختی کارڈ نمبر ${wrapStrictLTR(cnic)}`;
+            }).join('، ');
+
+            const bList = Array.from(bRows).map(r => {
+                let name = r.querySelector('.p-name').value.trim() || '__________';
+                let cnic = r.querySelector('.p-cnic').value.trim();
+                return `${name} شناختی کارڈ نمبر ${wrapStrictLTR(cnic)}`;
+            }).join('، ');
+
+            const pList = Array.from(pRows).map((r, i) => {
+                let m = r.querySelector('.pr-mouza').value.trim() || '____';
+                let k = r.querySelector('.pr-khata').value.trim() || '__';
+                let kt = r.querySelector('.pr-khatooni').value.trim() || '__';
+                let a = r.querySelector('.pr-area').value.trim() || '____';
+                let sk = r.querySelector('.pr-salem').value.trim();
+
+                let txt = (i === 0 ? "واقع موضع " : "") + `${m} کھاتہ/کھیوٹ نمبر ${k}، کھتونی نمبر ${kt}، رقبہ منتقلہ (${a})`;
+                
+                // Fixed: "مشترکہ کھاتہ میں سے مخصوص حصہ 1/1"
+                if (sk) {
+                    if (sk.includes("مشترکہ کھاتہ")) {
+                        txt += `، ${sk}`;
+                    } else {
+                        txt += `، مشترکہ کھاتہ میں سے مخصوص حصہ ${wrapStrictLTR(sk)}`;
+                    }
+                }
+                return txt;
+            }).join('، اور ');
+
+            const task = document.getElementById('task').value.trim();
+            let taskStr = task ? ` ٹاسک نمبر: ${wrapStrictLTR(task)}` : "";
+
+            let finalDeed = "";
+
+            if (currentType === 'sale') {
+                const amt = document.getElementById('amount').value.trim() || '____';
+                finalDeed = `${sTerm} ${sList} نے اپنا ملکیتی رقبہ ${pList} واقع بیرون حدود کمیٹی تحصیل صادق آباد، ضلع رحیم یار خان مبلغ ${wrapStrictLTR(amt)} روپے کے عوض ${bTerm} ${bList} کو قطعی فروخت کر دیا ہے۔ ${sTerm} نے پوری رقم گواہان کے روبرو نقد وصول کر کے قبضہ رقبہ مشتری کے حوالے کر دیا ہے، جس نے موقع پر قبضہ سنبھال لیا ہے۔ یہ رقبہ ہر قسم کے بار کفالت سے پاک و صاف ہے اور کوئی حکم امتناعی نہ ہے۔ دستاویز ہذا کے جملہ کوائف بائعان اور مشتریان نے خود فراہم کیے ہیں، کسی غلط بیانی کی صورت میں عملہ سب رجسٹریشن برانچ، سب رجسٹرار صاحب اور تحریر کنندہ ذمہ دار نہ ہوں گے۔ لہٰذا یہ تحریر بطور سند لکھ دی ہے تاکہ ریکارڈ میں رہے۔${taskStr}`;
+            } else {
+                let hType = (document.getElementById('opt-hiba').checked ? "ہبہ" : "") + (document.getElementById('opt-tamleek').checked ? "/تملیک" : "");
+                if (!hType) hType = "ہبہ/تملیک";
+                let hTarget = (document.getElementById('opt-waris').checked ? " بحق وارثان" : "") + (document.getElementById('opt-ghair-waris').checked ? " بحق غیر وارثان" : "");
+
+                finalDeed = `من ${sTerm} ${sList} نے اپنا ملکیتی رقبہ ${pList} واقع بیرون حدود کمیٹی تحصیل صادق آباد، ضلع رحیم یار خان، بلا معاوضہ بطریقِ ${hType}${hTarget} ${bTerm} ${bList} کے نام منتقل کر دیا ہے۔ ${sTerm} نے قبضہ رقبہ موہوب الیہ کے حوالے کر دیا ہے، جس نے موقع پر قبضہ سنبھال لیا ہے۔ یہ رقبہ ہر قسم کے بار کفالت سے پاک و صاف ہے۔ دستاویز ہذا کے جملہ کوائف واہب اور موہوب الیہ نے خود فراہم کیے ہیں، کسی غلط بیانی کی صورت میں عملہ سب رجسٹریشن برانچ، سب رجسٹرار صاحب اور تحریر کنندہ ذمہ دار نہ ہوں گے۔ لہٰذا یہ تحریر بطور سند لکھ دی ہے تاکہ ریکارڈ میں رہے۔${taskStr}`;
+            }
+
+            document.getElementById('faislaOutput').innerText = finalDeed;
+        }
+
+        // PLRA Smart Extraction Logic
+        function extractEntitiesAndFill(text) {
+            if (!text || text.trim().length === 0) return;
+
+            // 1. Doc Type
+            if (text.includes("ہبہ") || text.includes("تملیک") || text.includes("برائے ہبہ")) {
+                changeDocType('hiba');
+            }
+
+            // 2. Extract CNICs
+            const cnicRegex = /\b\d{5}[-\s]?\d{7}[-\s]?\d\b/g;
+            const foundCNICs = text.match(cnicRegex) || [];
+
+            // 3. Extract Owner Name
+            let extractedName = "";
+            const namePattern = /(?:نام مالک|مالک|نام|مسماۃ|مسمی)\s*[:،-]?\s*([\u0600-\u06FF\s]+?(?:ولد|دختر|زوجہ|بیوہ|قوم|ساکن)[\u0600-\u06FF\s]+?)(?=\s*(?:شناختی|کھاتہ|کھیوٹ|حصہ|نوعیت|مالک|$|\n))/i;
+            const nameMatch = text.match(namePattern);
+            if (nameMatch) {
+                extractedName = nameMatch[1].replace(/کوائف|مالکان|نوعیت|حقوق/g, '').trim();
+            }
+
+            if (foundCNICs.length > 0 || extractedName) {
+                document.getElementById('sellers-container').innerHTML = '';
+                if (foundCNICs.length > 0) {
+                    foundCNICs.forEach((rawCnic, idx) => {
+                        let cln = rawCnic.replace(/\D/g, '');
+                        let fmt = cln.substring(0,5) + '-' + cln.substring(5,12) + '-' + cln.substring(12,13);
+                        addPartyRow('sellers', idx === 0 ? extractedName : '', fmt);
+                    });
+                } else if (extractedName) {
+                    addPartyRow('sellers', extractedName, '');
+                }
+            }
+
+            // 4. Khewat / Khata No
+            let khewat = "";
+            const khewatMatch = text.match(/(?:کھیوٹ نمبر|کھیوٹ|کھاتہ نمبر|کھاتہ)\s*[:،-]?\s*([0-9\/\-]+)/i);
+            if (khewatMatch) khewat = khewatMatch[1].trim();
+
+            // 5. Khatooni No
+            let khatooni = "";
+            const khatooniMatch = text.match(/(?:کھتونی نمبر|کھتونی)\s*[:،-]?\s*([0-9\|\/\-]+)/i);
+            if (khatooniMatch) {
+                khatooni = khatooniMatch[1].replace(/\|/g, '/').trim();
+            }
+
+            // 6. Area
+            let area = "";
+            const plraAreaMatch = text.match(/\b(\d{1,3})[-–](\d{1,2})[-–](\d{1,4})\b/);
+            if (plraAreaMatch) {
+                area = `${plraAreaMatch[1]} کنال ${plraAreaMatch[2]} مرلہ ${plraAreaMatch[3]} فٹ (${plraAreaMatch[0]})`;
+            } else {
+                const stdArea = text.match(/(?:مخصوص رقبہ|رقبہ منتقلہ|رقبہ)\s*[:،-]?\s*([0-9\u0600-\u06FF\s\/\-]+?(?:کنال|مرلہ|فٹ|سرسائی|ایکڑ)?)(?=\s*(?:مشترکہ|حصہ|سالم|کھاتہ|$|\n))/i);
+                if (stdArea) area = stdArea[1].trim();
+            }
+
+            // 7. Hissa (1/1)
+            let hissa = "";
+            const hissaMatch = text.match(/(?:مخصوص حصہ|مشترکہ کھاتہ میں مخصوص حصہ|مشترکہ کھاتہ میں سے مخصوص حصہ|حصہ)\s*[:،-]?\s*([0-9\/\-]+)/i);
+            if (hissaMatch) {
+                hissa = hissaMatch[1].trim();
+            } else if (text.includes("1/1")) {
+                hissa = "1/1";
+            }
+
+            // 8. Mouza
+            let mouza = "";
+            const mouzaMatch = text.match(/(?:موضع|واقع موضع|چک نمبر)\s*[:،-]?\s*([\u0600-\u06FF\s0-9]+?)(?=\s*(?:تحصیل|ضلع|کھاتہ|کھیوٹ|حدود|$|\n))/i);
+            if (mouzaMatch) mouza = mouzaMatch[1].trim();
+
+            if (khewat || khatooni || area || mouza || hissa) {
+                document.getElementById('properties-container').innerHTML = '';
+                addPropertyRow(mouza, khewat, khatooni, area, hissa);
+            }
+
+            // 9. Task
+            const taskMatch = text.match(/(?:ٹاسک|Task|Application)\s*[:#№-]?\s*([0-9]{3,12})/i);
+            if (taskMatch) document.getElementById('task').value = taskMatch[1];
+
+            saveAndBuild();
+        }
+
+        // OCR / PDF Reader
+        async function processSmartFile(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const status = document.getElementById('fetchStatus');
+            status.style.display = 'inline';
+            status.innerText = "فرد سے ڈیٹا پڑھا جا رہا ہے...";
+
+            try {
+                let fullText = "";
+
+                if (file.type === "application/pdf") {
+                    const data = await file.arrayBuffer();
+                    const pdf = await pdfjsLib.getDocument({ data }).promise;
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const txt = await page.getTextContent();
+                        fullText += txt.items.map(item => item.str).join(" ") + "\n";
+                    }
+                } else {
+                    const res = await Tesseract.recognize(file, 'urd+eng', {
+                        logger: m => {
+                            if (m.status === 'recognizing text') {
+                                status.innerText = `OCR: ${Math.round(m.progress * 100)}%`;
+                            }
+                        }
+                    });
+                    fullText = res.data.text;
+                }
+
+                extractEntitiesAndFill(fullText);
+                status.innerText = "جمع بندی کا ڈیٹا کامیابی سے شامل ہو گیا!";
+                setTimeout(() => { status.style.display = 'none'; }, 3000);
+            } catch (err) {
+                console.error(err);
+                status.innerText = "فائل سے خودکار ڈیٹا نہ پڑھا جا سکا۔";
+            }
+        }
+
+        // Paste Modal Handlers
+        function openPasteModal() { document.getElementById('pasteModal').style.display = 'flex'; }
+        function closePasteModal() { document.getElementById('pasteModal').style.display = 'none'; }
+        function processRawText() {
+            const raw = document.getElementById('rawPastedText').value;
+            extractEntitiesAndFill(raw);
+            closePasteModal();
+        }
+
+        // Storage Handlers
+        function saveAndBuild() {
+            const state = {
+                currentType,
+                task: document.getElementById('task').value,
+                amount: document.getElementById('amount').value,
+                optHiba: document.getElementById('opt-hiba').checked,
+                optTamleek: document.getElementById('opt-tamleek').checked,
+                optWaris: document.getElementById('opt-waris').checked,
+                optGhairWaris: document.getElementById('opt-ghair-waris').checked,
+                sellers: Array.from(document.querySelectorAll('#sellers-container .item-row')).map(r => ({
+                    n: r.querySelector('.p-name').value,
+                    c: r.querySelector('.p-cnic').value
+                })),
+                buyers: Array.from(document.querySelectorAll('#buyers-container .item-row')).map(r => ({
+                    n: r.querySelector('.p-name').value,
+                    c: r.querySelector('.p-cnic').value
+                })),
+                properties: Array.from(document.querySelectorAll('#properties-container .item-row')).map(r => ({
+                    m: r.querySelector('.pr-mouza').value,
+                    k: r.querySelector('.pr-khata').value,
+                    kt: r.querySelector('.pr-khatooni').value,
+                    a: r.querySelector('.pr-area').value,
+                    s: r.querySelector('.pr-salem').value
+                }))
+            };
+            localStorage.setItem('faisla_jamabandi_v5', JSON.stringify(state));
+            buildDeed();
+        }
+
+        function loadSaved() {
+            const saved = localStorage.getItem('faisla_jamabandi_v5');
+            if (saved) {
+                const s = JSON.parse(saved);
+                currentType = s.currentType || 'sale';
+                changeDocType(currentType);
+                document.getElementById('task').value = s.task || '';
+                document.getElementById('amount').value = s.amount || '';
+                document.getElementById('opt-hiba').checked = s.optHiba !== undefined ? s.optHiba : true;
+                document.getElementById('opt-tamleek').checked = s.optTamleek !== undefined ? s.optTamleek : true;
+                document.getElementById('opt-waris').checked = s.optWaris || false;
+                document.getElementById('opt-ghair-waris').checked = s.optGhairWaris || false;
+
+                if (s.sellers && s.sellers.length) {
+                    s.sellers.forEach(p => addPartyRow('sellers', p.n, p.c));
+                } else addPartyRow('sellers');
+
+                if (s.buyers && s.buyers.length) {
+                    s.buyers.forEach(p => addPartyRow('buyers', p.n, p.c));
+                } else addPartyRow('buyers');
+
+                if (s.properties && s.properties.length) {
+                    s.properties.forEach(p => addPropertyRow(p.m, p.k, p.kt, p.a, p.s));
+                } else addPropertyRow();
+            } else {
+                addPartyRow('sellers');
+                addPartyRow('buyers');
+                addPropertyRow();
+            }
+        }
+
+        function clearAll() {
+            if (confirm("کیا آپ تمام ڈیٹا صاف کرنا چاہتے ہیں؟")) {
+                localStorage.removeItem('faisla_jamabandi_v5');
+                location.reload();
+            }
+        }
+
+        function copyResult() {
+            const text = document.getElementById('faislaOutput').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert("تحریر کاپی کر لی گئی ہے!");
+            });
+        }
+    </script>
+</body>
+</html>
